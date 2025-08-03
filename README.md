@@ -1,8 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FINOVA 🦊
+**Innovando hoy, transformando finanzas**
 
-## Getting Started
+FINOVA es una plataforma de soluciones de inteligencia artificial para el sector financiero, enfocada en resolver problemas críticos en licitaciones públicas y evaluación crediticia para PYMEs.
 
-First, run the development server:
+## 🎯 Nuestra Misión
+Democratizar el acceso a procesos financieros más eficientes y justos a través de tecnología de vanguardia.
+
+## 🚀 Soluciones
+
+### 1. IA para Licitaciones Inteligentes
+- **Problema**: Procesos de licitación ineficientes y propensos a errores
+- **Solución**: Sistema de IA con NLP avanzado para análisis automático de documentos
+- **Impacto**: 75% menos tiempo, 90% menos errores
+
+### 2. Evaluación Crediticia Inclusiva para PYMEs  
+- **Problema**: Exclusión financiera de pequeñas empresas
+- **Solución**: Algoritmos de ML para evaluación con datos alternativos
+- **Impacto**: Acceso financiero para empresas tradicionalmente excluidas
+
+## 🎨 Marca e Identidad
+
+### Paleta de Colores
+- **Azul Oscuro** (#0D3B66): Confianza y profesionalismo
+- **Verde Azulado** (#1FAA59): Innovación y crecimiento  
+- **Naranja** (#F25C05): Energía y acción
+- **Gris Claro** (#E1E5F2): Neutralidad y balance
+
+### Mascota: Byte 🦊
+Nuestro zorro tecnológico representa agilidad, inteligencia y adaptabilidad - cualidades esenciales en el fintech moderno.
+
+## 🛠️ Tecnologías
+- **Frontend**: Next.js 15, React, TypeScript
+- **Styling**: CSS Vanilla con sistema de diseño personalizado
+- **IA/ML**: Simulaciones de algoritmos de NLP y Machine Learning
+
+## 🚀 Instalación y Uso
+
+Primero, ejecuta el servidor de desarrollo:
 
 ```bash
 npm run dev
