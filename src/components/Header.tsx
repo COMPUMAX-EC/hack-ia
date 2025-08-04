@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface HeaderProps {
   currentPage?: 'inicio' | 'reto1' | 'reto2' | 'equipo';
@@ -11,9 +12,11 @@ export default function Header({ currentPage = 'inicio' }: HeaderProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-20">
-              <img 
+              <Image 
                 src="/finova-logo.png" 
                 alt="FINOVA Logo" 
+                width={36}
+                height={36}
                 className="w-6 h-6 object-contain"
                 style={{maxWidth: '36px', maxHeight: '36px'}}
               />

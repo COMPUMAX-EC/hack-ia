@@ -5,7 +5,16 @@ import Header from '../../components/Header';
 
 export default function Reto1() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [analysisResult, setAnalysisResult] = useState<{
+    score: number;
+    riskLevel: string;
+    recommendations: string[];
+    documentType: string;
+    legalCompliance: number;
+    technicalCompliance: number;
+    estimatedProcessingTime: string;
+    traditionalTime: string;
+  } | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,6 +33,7 @@ export default function Reto1() {
     setTimeout(() => {
       setAnalysisResult({
         documentType: 'Licitación Pública de Infraestructura',
+        score: 88,
         riskLevel: 'Medio',
         technicalCompliance: 85,
         legalCompliance: 92,

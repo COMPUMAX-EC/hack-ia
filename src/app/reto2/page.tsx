@@ -12,7 +12,19 @@ export default function Reto2() {
     digitalPresence: '',
     commercialReferences: ''
   });
-  const [riskAssessment, setRiskAssessment] = useState<any>(null);
+  const [riskAssessment, setRiskAssessment] = useState<{
+    creditScore: number;
+    riskLevel: string;
+    approvalProbability: number;
+    recommendedAmount: string;
+    recommendations: string[];
+    interestRate: number;
+    factors: {
+      digitalPresence: number;
+      commercialReputation: number;
+      businessStability: number;
+    };
+  } | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -35,13 +47,12 @@ export default function Reto2() {
         creditScore: score,
         riskLevel: riskLevel,
         approvalProbability: score >= 750 ? 85 : score >= 650 ? 65 : 35,
-        recommendedAmount: creditAmount,
+        recommendedAmount: `$${creditAmount.toLocaleString()}`,
         interestRate: score >= 750 ? 12 : score >= 650 ? 18 : 25,
         factors: {
           digitalPresence: Math.floor(Math.random() * 30) + 70,
           commercialReputation: Math.floor(Math.random() * 30) + 75,
-          businessStability: Math.floor(Math.random() * 25) + 70,
-          financialBehavior: Math.floor(Math.random() * 20) + 80
+          businessStability: Math.floor(Math.random() * 25) + 70
         },
         recommendations: [
           'Mejorar presencia digital con testimonios de clientes',

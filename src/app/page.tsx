@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import Header from "../components/Header";
+import Image from "next/image";
 import { 
   FileText, 
   Building2, 
@@ -275,9 +275,11 @@ export default function Home() {
       <footer className="py-12 px-4 relative overflow-hidden" style={{background: 'rgba(31, 170, 89, 0.1)'}}>
         <div className="max-w-7xl mx-auto text-center relative z-20">
           <div className="flex justify-center items-center gap-4 mb-6">
-            <img 
+            <Image 
               src="/finova-logo.png" 
               alt="FINOVA Logo" 
+              width={48}
+              height={48}
               className="w-12 h-12 object-contain"
             />
             <h3 className="text-2xl font-bold" style={{color: '#0D3B66'}}>FINOVA</h3>

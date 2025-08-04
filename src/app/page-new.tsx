@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { 
   FileText, 
@@ -7,12 +6,7 @@ import {
   TrendingUp, 
   Search, 
   Zap, 
-  BarChart3, 
-  CreditCard, 
-  Users, 
-  Shield, 
-  DollarSign,
-  CheckCircle
+  BarChart3
 } from "lucide-react";
 
 export default function Home() {
