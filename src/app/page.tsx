@@ -11,6 +11,8 @@ import {
   BarChart3
 } from "lucide-react";
 
+// FINOVA - AI-powered financial solutions
+
 export default function Home() {
   return (
     <div className="min-h-screen" style={{background: 'white'}}>
