@@ -6,17 +6,24 @@ Endpoints para integración con API de Contrataciones Abiertas Ecuador
 from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import List, Dict, Any, Optional
 import asyncio
+import json
+import logging
 from datetime import datetime
 
 from ..services.langchain_service import LangChainService
 from ..services.ocds_sercop_integration import OCDSSercop, SERCOPIntegratedService
+from ..services.gemini_service import GeminiLicitacionesService
 
 router = APIRouter(prefix="/sercop", tags=["SERCOP OCDS"])
+
+# Logger
+logger = logging.getLogger("SERCOP_OCDS")
 
 # Instancias de servicios
 ocds_client = OCDSSercop()
 langchain_service = LangChainService()
 sercop_integrated = SERCOPIntegratedService(langchain_service)
+gemini_service = GeminiLicitacionesService()
 
 @router.get("/buscar", summary="Buscar licitaciones en SERCOP")
 async def buscar_licitaciones(
@@ -467,5 +474,333 @@ def _generar_recomendaciones_oportunidades(oportunidades: List[Dict]) -> List[st
     
     valor_total = sum(_extraer_valor_estimado(proc) for proc in oportunidades)
     recomendaciones.append(f"Valor total de oportunidades: ${valor_total:,.0f}")
+
+
+# ==========================================
+# ENDPOINTS GEMINI AI
+# ==========================================
+
+@router.post("/analisis-gemini/licitacion")
+async def analizar_licitacion_gemini(
+    ocid: str = Query(..., description="Identificador OCID del proceso"),
+    incluir_documentos: bool = Query(True, description="Incluir análisis de documentos")
+) -> Dict[str, Any]:
+    """
+    Análisis completo de licitación usando Google Gemini AI
+    """
+    try:
+        # Obtener datos del proceso
+        proceso = await ocds_client.get_release_by_ocid(ocid)
+        if not proceso:
+            raise HTTPException(status_code=404, detail="Proceso no encontrado")
+        
+        # Preparar contenido para análisis
+        content = f"""
+        PROCESO DE CONTRATACIÓN PÚBLICA
+        
+        ID: {proceso.get('ocid', '')}
+        Título: {proceso.get('title', '')}
+        Descripción: {proceso.get('description', '')}
+        
+        INFORMACIÓN BÁSICA:
+        - Método de contratación: {proceso.get('tender', {}).get('procurementMethod', '')}
+        - Estado: {proceso.get('tender', {}).get('status', '')}
+        - Entidad: {proceso.get('buyer', {}).get('name', '')}
+        - Valor estimado: {proceso.get('tender', {}).get('value', {}).get('amount', 0)}
+        - Moneda: {proceso.get('tender', {}).get('value', {}).get('currency', 'USD')}
+        
+        CRONOGRAMA:
+        - Fecha publicación: {proceso.get('tender', {}).get('datePublished', '')}
+        - Fecha límite consultas: {proceso.get('tender', {}).get('enquiryPeriod', {}).get('endDate', '')}
+        - Fecha límite ofertas: {proceso.get('tender', {}).get('tenderPeriod', {}).get('endDate', '')}
+        
+        CRITERIOS DE EVALUACIÓN:
+        {json.dumps(proceso.get('tender', {}).get('awardCriteria', []), indent=2)}
+        
+        REQUISITOS:
+        {json.dumps(proceso.get('tender', {}).get('eligibilityCriteria', ''), indent=2)}
+        """
+        
+        # Obtener documentos si se solicita
+        if incluir_documentos:
+            documentos = proceso.get('tender', {}).get('documents', [])
+            if documentos:
+                content += "\n\nDOCUMENTOS DISPONIBLES:\n"
+                for doc in documentos[:5]:  # Limitar a 5 documentos
+                    content += f"- {doc.get('title', 'Sin título')}: {doc.get('description', 'Sin descripción')}\n"
+        
+        # Análisis con Gemini
+        resultado = await gemini_service.analizar_documento_licitacion(
+            document_content=content,
+            document_type="Proceso SERCOP"
+        )
+        
+        # Enriquecer con datos del proceso
+        resultado.update({
+            "ocid": ocid,
+            "titulo_proceso": proceso.get('title', ''),
+            "entidad_contratante": proceso.get('buyer', {}).get('name', ''),
+            "valor_proceso": proceso.get('tender', {}).get('value', {}).get('amount', 0),
+            "estado_proceso": proceso.get('tender', {}).get('status', ''),
+            "fecha_analisis": datetime.now().isoformat(),
+            "fuente_datos": "SERCOP OCDS API + Gemini AI"
+        })
+        
+        return resultado
+        
+    except Exception as e:
+        logger.error(f"Error en análisis Gemini: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error en análisis: {str(e)}")
+
+
+@router.post("/analisis-gemini/riesgos")
+async def analizar_riesgos_gemini(
+    ocid: str = Query(..., description="Identificador OCID del proceso")
+) -> Dict[str, Any]:
+    """
+    Análisis específico de riesgos usando Gemini AI
+    """
+    try:
+        # Obtener proceso
+        proceso = await ocds_client.get_release_by_ocid(ocid)
+        if not proceso:
+            raise HTTPException(status_code=404, detail="Proceso no encontrado")
+        
+        # Preparar contenido para análisis de riesgos
+        tender = proceso.get('tender', {})
+        valor = tender.get('value', {}).get('amount', 0)
+        
+        content = f"""
+        ANÁLISIS DE RIESGOS - PROCESO SERCOP
+        
+        Proyecto: {proceso.get('title', '')}
+        Valor: ${valor:,.2f} {tender.get('value', {}).get('currency', 'USD')}
+        Entidad: {proceso.get('buyer', {}).get('name', '')}
+        Método: {tender.get('procurementMethod', '')}
+        
+        ESPECIFICACIONES TÉCNICAS:
+        {tender.get('description', '')}
+        
+        CRITERIOS DE ELEGIBILIDAD:
+        {tender.get('eligibilityCriteria', '')}
+        
+        DOCUMENTOS REQUERIDOS:
+        {json.dumps([doc.get('title', '') for doc in tender.get('documents', [])], indent=2)}
+        
+        CRONOGRAMA:
+        - Publicación: {tender.get('datePublished', '')}
+        - Fin consultas: {tender.get('enquiryPeriod', {}).get('endDate', '')}
+        - Fin ofertas: {tender.get('tenderPeriod', {}).get('endDate', '')}
+        """
+        
+        # Análisis de riesgos con Gemini
+        resultado = await gemini_service.analizar_riesgos_construccion(
+            document_content=content,
+            project_value=valor
+        )
+        
+        # Agregar contexto del proceso
+        resultado.update({
+            "ocid": ocid,
+            "valor_proyecto": valor,
+            "metodo_contratacion": tender.get('procurementMethod', ''),
+            "entidad_contratante": proceso.get('buyer', {}).get('name', ''),
+            "fecha_analisis": datetime.now().isoformat()
+        })
+        
+        return resultado
+        
+    except Exception as e:
+        logger.error(f"Error en análisis de riesgos: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+@router.post("/analisis-gemini/comparar")
+async def comparar_procesos_gemini(
+    ocid1: str = Query(..., description="Primer proceso a comparar"),
+    ocid2: str = Query(..., description="Segundo proceso a comparar"),
+    criterios: Optional[List[str]] = Query(None, description="Criterios específicos de comparación")
+) -> Dict[str, Any]:
+    """
+    Comparación inteligente entre dos procesos usando Gemini AI
+    """
+    try:
+        # Obtener ambos procesos
+        proceso1 = await ocds_client.get_release_by_ocid(ocid1)
+        proceso2 = await ocds_client.get_release_by_ocid(ocid2)
+        
+        if not proceso1 or not proceso2:
+            raise HTTPException(status_code=404, detail="Uno o ambos procesos no encontrados")
+        
+        # Preparar contenido de ambos procesos
+        def preparar_contenido_proceso(proceso, label):
+            tender = proceso.get('tender', {})
+            return f"""
+            {label}:
+            Título: {proceso.get('title', '')}
+            Entidad: {proceso.get('buyer', {}).get('name', '')}
+            Valor: ${tender.get('value', {}).get('amount', 0):,.2f}
+            Método: {tender.get('procurementMethod', '')}
+            Descripción: {tender.get('description', '')}
+            Estado: {tender.get('status', '')}
+            Criterios elegibilidad: {tender.get('eligibilityCriteria', '')}
+            """
+        
+        propuesta1 = preparar_contenido_proceso(proceso1, "PROCESO A")
+        propuesta2 = preparar_contenido_proceso(proceso2, "PROCESO B")
+        
+        # Comparación con Gemini
+        resultado = await gemini_service.comparar_propuestas(
+            propuesta1=propuesta1,
+            propuesta2=propuesta2,
+            criterios_evaluacion=criterios
+        )
+        
+        # Enriquecer resultado
+        resultado.update({
+            "proceso_a": {
+                "ocid": ocid1,
+                "titulo": proceso1.get('title', ''),
+                "valor": proceso1.get('tender', {}).get('value', {}).get('amount', 0)
+            },
+            "proceso_b": {
+                "ocid": ocid2,
+                "titulo": proceso2.get('title', ''),
+                "valor": proceso2.get('tender', {}).get('value', {}).get('amount', 0)
+            },
+            "fecha_comparacion": datetime.now().isoformat()
+        })
+        
+        return resultado
+        
+    except Exception as e:
+        logger.error(f"Error en comparación: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+@router.post("/analisis-gemini/extraer-info")
+async def extraer_informacion_gemini(
+    ocid: str = Query(..., description="Identificador OCID del proceso")
+) -> Dict[str, Any]:
+    """
+    Extracción inteligente de información clave usando Gemini AI
+    """
+    try:
+        # Obtener proceso
+        proceso = await ocds_client.get_release_by_ocid(ocid)
+        if not proceso:
+            raise HTTPException(status_code=404, detail="Proceso no encontrado")
+        
+        # Preparar contenido completo
+        tender = proceso.get('tender', {})
+        buyer = proceso.get('buyer', {})
+        
+        content = f"""
+        DOCUMENTO DE CONTRATACIÓN PÚBLICA SERCOP
+        
+        INFORMACIÓN GENERAL:
+        ID: {proceso.get('ocid', '')}
+        Título: {proceso.get('title', '')}
+        Descripción: {proceso.get('description', '')}
+        
+        ENTIDAD CONTRATANTE:
+        Nombre: {buyer.get('name', '')}
+        ID: {buyer.get('id', '')}
+        
+        PROCEDIMIENTO:
+        Método: {tender.get('procurementMethod', '')}
+        Estado: {tender.get('status', '')}
+        Valor: ${tender.get('value', {}).get('amount', 0):,.2f}
+        Moneda: {tender.get('value', {}).get('currency', 'USD')}
+        
+        CRONOGRAMA:
+        Fecha publicación: {tender.get('datePublished', '')}
+        Período consultas: {tender.get('enquiryPeriod', {}).get('startDate', '')} - {tender.get('enquiryPeriod', {}).get('endDate', '')}
+        Período ofertas: {tender.get('tenderPeriod', {}).get('startDate', '')} - {tender.get('tenderPeriod', {}).get('endDate', '')}
+        
+        ESPECIFICACIONES:
+        {tender.get('description', '')}
+        
+        CRITERIOS DE ELEGIBILIDAD:
+        {tender.get('eligibilityCriteria', '')}
+        
+        CRITERIOS DE EVALUACIÓN:
+        {json.dumps(tender.get('awardCriteria', []), indent=2)}
+        
+        DOCUMENTOS:
+        {json.dumps([{'titulo': doc.get('title', ''), 'descripcion': doc.get('description', '')} for doc in tender.get('documents', [])], indent=2)}
+        
+        GARANTÍAS:
+        {json.dumps(tender.get('guarantee', {}), indent=2)}
+        """
+        
+        # Extracción con Gemini
+        resultado = await gemini_service.extraer_informacion_clave(content)
+        
+        # Validar y complementar con datos directos
+        resultado.update({
+            "ocid_validado": proceso.get('ocid', ''),
+            "titulo_validado": proceso.get('title', ''),
+            "entidad_validada": buyer.get('name', ''),
+            "valor_validado": tender.get('value', {}).get('amount', 0),
+            "estado_validado": tender.get('status', ''),
+            "fecha_extraccion": datetime.now().isoformat(),
+            "fuente": "SERCOP OCDS + Gemini AI"
+        })
+        
+        return resultado
+        
+    except Exception as e:
+        logger.error(f"Error en extracción: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+@router.get("/analisis-gemini/test")
+async def test_gemini_service() -> Dict[str, Any]:
+    """
+    Endpoint de prueba para verificar funcionamiento de Gemini
+    """
+    try:
+        # Documento de prueba
+        test_document = """
+        LICITACIÓN PÚBLICA INTERNACIONAL
+        Entidad: Ministerio de Transporte y Obras Públicas
+        Objeto: Construcción de puente vehicular sobre río Pastaza
+        Valor referencial: $2,500,000.00 USD
+        Plazo: 18 meses
+        
+        Requisitos principales:
+        - Experiencia mínima 10 años en construcción de puentes
+        - Capacidad instalada certificada
+        - Personal técnico especializado
+        
+        Garantías requeridas:
+        - Garantía fiel cumplimiento: 10% del valor del contrato
+        - Garantía técnica: 24 meses
+        """
+        
+        # Análisis de prueba
+        resultado = await gemini_service.analizar_licitacion_completa(
+            document_content=test_document,
+            document_type="Licitación de Prueba",
+            entity_name="MTOP"
+        )
+        
+        resultado.update({
+            "test_status": "SUCCESS",
+            "gemini_available": not gemini_service.use_simulation,
+            "fecha_test": datetime.now().isoformat()
+        })
+        
+        return resultado
+        
+    except Exception as e:
+        logger.error(f"Error en test Gemini: {str(e)}")
+        return {
+            "test_status": "ERROR",
+            "error": str(e),
+            "gemini_available": False,
+            "fecha_test": datetime.now().isoformat()
+        }
     
     return recomendaciones
