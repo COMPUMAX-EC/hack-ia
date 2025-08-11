@@ -1,6 +1,4 @@
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
+import google.generativeai as genai
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 import os
@@ -33,146 +31,92 @@ class CreditAnalysis(BaseModel):
     risk_factors: List[str] = Field(description="Factores de riesgo identificados")
 
 class LangChainService:
-    """Servicio principal de LangChain para análisis con IA"""
+    """Servicio principal para análisis con Gemini AI"""
     
     def __init__(self):
-        self.openai_api_key = os.getenv("OPENAI_API_KEY")
-        if self.openai_api_key:
-            self.llm = ChatOpenAI(
-                temperature=0.3,
-                model="gpt-3.5-turbo",
-                api_key=self.openai_api_key
-            )
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY")
+        if self.gemini_api_key:
+            genai.configure(api_key=self.gemini_api_key)
+            self.model = genai.GenerativeModel("gemini-pro")
         else:
-            # Modo simulación si no hay API key
-            self.llm = None
-            print("⚠️ OPENAI_API_KEY no encontrada - usando modo simulación")
+            self.model = None
+            print("⚠️ GEMINI_API_KEY no encontrada - usando modo simulación")
     
     async def analyze_licitacion_document(self, document_content: str, document_type: str = "unknown") -> Dict[str, Any]:
         """
-        Analizar documento de licitación usando LangChain + OpenAI
+        Analizar documento de licitación usando Gemini
         """
-        if not self.llm:
+        if not self.model:
             return self._simulate_licitacion_analysis(document_content, document_type)
         
+        prompt = f"""
+Eres un experto analista de licitaciones públicas con más de 15 años de experiencia.
+Analiza el siguiente documento de licitación y responde ÚNICAMENTE en formato JSON válido con la siguiente estructura:
+{{
+    "score": float, // Puntuación del 0 al 100
+    "risk_level": "bajo|medio|alto",
+    "document_type": string,
+    "legal_compliance": float,
+    "technical_compliance": float,
+    "recommendations": [string],
+    "key_issues": [string],
+    "strengths": [string]
+}}
+Tipo de documento: {document_type}
+Contenido del documento:
+{document_content}
+"""
         try:
-            # Configurar el parser de salida
-            parser = JsonOutputParser(pydantic_object=LicitacionAnalysis)
-            
-            # Crear el prompt template
-            system_template = """
-            Eres un experto analista de licitaciones públicas con más de 15 años de experiencia.
-            Tu tarea es analizar documentos de licitación y proporcionar una evaluación completa.
-            
-            Debes evaluar:
-            1. Cumplimiento legal y normativo
-            2. Calidad técnica de la propuesta
-            3. Completitud de la documentación
-            4. Riesgos potenciales
-            5. Fortalezas de la propuesta
-            
-            IMPORTANTE: Responde ÚNICAMENTE en formato JSON válido con la siguiente estructura:
-            {format_instructions}
-            """
-            
-            human_template = """
-            Analiza el siguiente documento de licitación:
-            
-            Tipo de documento: {document_type}
-            Contenido del documento:
-            {document_content}
-            
-            Proporciona un análisis completo y detallado.
-            """
-            
-            prompt = ChatPromptTemplate.from_messages([
-                SystemMessagePromptTemplate.from_template(system_template),
-                HumanMessagePromptTemplate.from_template(human_template)
-            ])
-            
-            # Crear la cadena de procesamiento
-            chain = prompt | self.llm | parser
-            
-            # Ejecutar el análisis
-            result = await chain.ainvoke({
-                "document_content": document_content[:4000],  # Limitar tamaño
-                "document_type": document_type,
-                "format_instructions": parser.get_format_instructions()
-            })
-            
-            return result
-            
+            response = await self.model.generate_content_async(prompt)
+            # Buscar el primer bloque JSON en la respuesta
+            import re
+            match = re.search(r'\{.*\}', response.text, re.DOTALL)
+            if match:
+                return json.loads(match.group(0))
+            else:
+                raise ValueError("No se encontró JSON en la respuesta de Gemini.")
         except Exception as e:
-            print(f"Error en análisis LangChain: {e}")
+            print(f"Error en análisis Gemini: {e}")
             return self._simulate_licitacion_analysis(document_content, document_type)
     
     async def analyze_credit_risk(self, company_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Analizar riesgo crediticio usando LangChain + OpenAI
+        Analizar riesgo crediticio usando Gemini
         """
-        if not self.llm:
+        if not self.model:
             return self._simulate_credit_analysis(company_data)
         
+        prompt = f"""
+Eres un experto analista de riesgo crediticio especializado en PYMEs latinoamericanas.
+Analiza la siguiente empresa y responde ÚNICAMENTE en formato JSON válido con la siguiente estructura:
+{{
+    "credit_score": int, // 300 a 850
+    "risk_level": "bajo|medio|alto",
+    "approval_probability": float,
+    "digital_presence_score": float,
+    "business_stability_score": float,
+    "financial_capacity_score": float,
+    "recommendations": [string],
+    "risk_factors": [string]
+}}
+Datos de la empresa:
+- Nombre: {company_data.get("company_name", "")}
+- Tipo de negocio: {company_data.get("business_type", "")}
+- Años en operación: {company_data.get("years_in_business", "")}
+- Ingresos mensuales: {company_data.get("monthly_revenue", "")}
+- Presencia digital: {company_data.get("digital_presence", "")}
+- Referencias comerciales: {company_data.get("commercial_references", "")}
+"""
         try:
-            # Configurar el parser de salida
-            parser = JsonOutputParser(pydantic_object=CreditAnalysis)
-            
-            # Crear el prompt template
-            system_template = """
-            Eres un experto analista de riesgo crediticio especializado en PYMEs latinoamericanas.
-            Tu experiencia incluye evaluación de empresas sin historial crediticio formal.
-            
-            Debes analizar:
-            1. Presencia digital y reputación online
-            2. Estabilidad y tiempo del negocio
-            3. Capacidad financiera basada en ingresos
-            4. Factores de riesgo específicos
-            5. Potencial de crecimiento
-            
-            Considera que estas empresas no tienen historial crediticio tradicional,
-            por lo que debes usar datos alternativos para la evaluación.
-            
-            IMPORTANTE: Responde ÚNICAMENTE en formato JSON válido:
-            {format_instructions}
-            """
-            
-            human_template = """
-            Analiza el riesgo crediticio de la siguiente empresa:
-            
-            Datos de la empresa:
-            - Nombre: {company_name}
-            - Tipo de negocio: {business_type}
-            - Años en operación: {years_in_business}
-            - Ingresos mensuales: {monthly_revenue}
-            - Presencia digital: {digital_presence}
-            - Referencias comerciales: {commercial_references}
-            
-            Proporciona una evaluación completa del riesgo crediticio.
-            """
-            
-            prompt = ChatPromptTemplate.from_messages([
-                SystemMessagePromptTemplate.from_template(system_template),
-                HumanMessagePromptTemplate.from_template(human_template)
-            ])
-            
-            # Crear la cadena de procesamiento
-            chain = prompt | self.llm | parser
-            
-            # Ejecutar el análisis
-            result = await chain.ainvoke({
-                "company_name": company_data.get("company_name", ""),
-                "business_type": company_data.get("business_type", ""),
-                "years_in_business": company_data.get("years_in_business", ""),
-                "monthly_revenue": company_data.get("monthly_revenue", ""),
-                "digital_presence": company_data.get("digital_presence", ""),
-                "commercial_references": company_data.get("commercial_references", ""),
-                "format_instructions": parser.get_format_instructions()
-            })
-            
-            return result
-            
+            response = await self.model.generate_content_async(prompt)
+            import re
+            match = re.search(r'\{.*\}', response.text, re.DOTALL)
+            if match:
+                return json.loads(match.group(0))
+            else:
+                raise ValueError("No se encontró JSON en la respuesta de Gemini.")
         except Exception as e:
-            print(f"Error en análisis crediticio LangChain: {e}")
+            print(f"Error en análisis crediticio Gemini: {e}")
             return self._simulate_credit_analysis(company_data)
     
     def _simulate_licitacion_analysis(self, document_content: str, document_type: str) -> Dict[str, Any]:
