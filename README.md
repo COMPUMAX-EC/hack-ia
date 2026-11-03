@@ -1,70 +1,56 @@
-# FINOVA 🦊
-**Innovando hoy, transformando finanzas**
+# FINOVA 🦊 · IA para licitaciones y crédito PYME
 
-FINOVA es una plataforma de soluciones de inteligencia artificial para el sector financiero, enfocada en resolver problemas críticos en licitaciones públicas y evaluación crediticia para PYMEs.
+**Innovando hoy, transformando finanzas.** FINOVA es la propuesta de nuestro equipo para una hackatón de
+inteligencia artificial en finanzas. Resuelve dos problemas del sector financiero de Ecuador:
 
-## 🎯 Nuestra Misión
-Democratizar el acceso a procesos financieros más eficientes y justos a través de tecnología de vanguardia.
+1. **Licitaciones inteligentes:** los procesos de licitación pública son lentos y propensos a errores. FINOVA
+   analiza los documentos automáticamente, detecta riesgos y compara ofertas para ahorrar tiempo al evaluador.
+2. **Evaluación crediticia inclusiva para PYMEs:** muchas pequeñas empresas no acceden a crédito porque no tienen
+   historial bancario. FINOVA calcula un **score crediticio con datos alternativos**: presencia digital,
+   referencias comerciales, actividad financiera y datos de comportamiento.
 
-## 🚀 Soluciones
+**Demo en línea:** https://hack-ia.vercel.app
 
-### 1. IA para Licitaciones Inteligentes
-- **Problema**: Procesos de licitación ineficientes y propensos a errores
-- **Solución**: Sistema de IA con NLP avanzado para análisis automático de documentos
-- **Impacto**: 75% menos tiempo, 90% menos errores
+> Es un prototipo: los análisis de NLP y Machine Learning están **simulados** en la interfaz para mostrar el flujo.
 
-### 2. Evaluación Crediticia Inclusiva para PYMEs  
-- **Problema**: Exclusión financiera de pequeñas empresas
-- **Solución**: Algoritmos de ML para evaluación con datos alternativos
-- **Impacto**: Acceso financiero para empresas tradicionalmente excluidas
+## Qué muestra la demo
 
-## 🎨 Marca e Identidad
+- `/` — presentación de FINOVA, misión y soluciones.
+- `/reto1` — licitaciones: tipo de documento, análisis automático, detección de riesgos, comparación inteligente.
+- `/reto2` — score crediticio IA para PYMEs y su impacto social.
+- `/equipo` — el equipo: Geovanny Basantes, Edison López y Jaime Pergueza.
 
-### Paleta de Colores
-- **Azul Oscuro** (#0D3B66): Confianza y profesionalismo
-- **Verde Azulado** (#1FAA59): Innovación y crecimiento  
-- **Naranja** (#F25C05): Energía y acción
-- **Gris Claro** (#E1E5F2): Neutralidad y balance
+Marca: azul oscuro `#0D3B66`, verde azulado `#1FAA59`, naranja `#F25C05` y gris claro `#E1E5F2`, con **Byte**, el
+zorro mascota.
 
-### Mascota: Byte 🦊
-Nuestro zorro tecnológico representa agilidad, inteligencia y adaptabilidad - cualidades esenciales en el fintech moderno.
+## Detalles técnicos
 
-## 🛠️ Tecnologías
-- **Frontend**: Next.js 15, React, TypeScript
-- **Styling**: CSS Vanilla con sistema de diseño personalizado
-- **IA/ML**: Simulaciones de algoritmos de NLP y Machine Learning
+| Capa | Tecnología |
+|---|---|
+| Framework | Next.js 15 (App Router) + React 19 |
+| Lenguaje | TypeScript |
+| Estilos | CSS propio con sistema de diseño |
+| Íconos | lucide-react |
+| Despliegue | Vercel |
 
-## 🚀 Instalación y Uso
-
-Primero, ejecuta el servidor de desarrollo:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+src/app/              páginas: inicio, reto1, reto2, equipo
+src/components/       Header, Layout, ByteMascot
+public/               logo, fotos del equipo
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Ejecutar localmente
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev      # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## In English
 
-## Learn More
+FINOVA is a hackathon prototype for AI in finance: automatic analysis of public tender documents, and an inclusive
+credit score for SMEs based on alternative data. AI results are simulated in the UI. Next.js 15 + React 19 on Vercel.
 
-To learn more about Next.js, take a look at the following resources:
+## Licencia
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El código está bajo licencia [MIT](LICENSE). Las fotos del equipo y la marca FINOVA no forman parte de la licencia.
