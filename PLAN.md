@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **Sector objetivo** | Banca y cooperativas (score crediticio PYME) + Control y contratación pública (licitaciones) |
-| **Segmento** | A para el score crediticio · B para licitaciones (SERCOP, Contraloría) |
-| **Esfuerzo asignado** | 4 % banca (A) + 7 % sector público (B) |
+| **Sector objetivo** | Banca y fintech (score crediticio PYME) + Control y regulación financiera (licitaciones: SERCOP, Contraloría) |
+| **Segmento** | A para el score crediticio · B para licitaciones |
+| **Esfuerzo asignado** | 4 % banca y fintech (A) + 8 % control y regulación financiera (B) |
 | **Horizonte** | 9-nov-2026 → 31-ene-2027 |
 
 ## Para quién se diseña
