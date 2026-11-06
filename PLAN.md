@@ -2,27 +2,27 @@
 
 | | |
 |---|---|
-| **Sector objetivo** | Banca y fintech (score crediticio PYME) + Control y regulación financiera (licitaciones: SERCOP, Contraloría) |
-| **Segmento** | A para el score crediticio · B para licitaciones |
-| **Esfuerzo asignado** | 4 % banca y fintech (A) + 8 % control y regulación financiera (B) |
+| **Sector objetivo** | Banca y fintech · score crediticio para PYMEs sin historial bancario |
+| **Segmento** | A (único segmento del plan) |
+| **Esfuerzo asignado** | 9 % del tiempo de proyectos (dentro del 50 % de banca y fintech) |
 | **Horizonte** | 9-nov-2026 → 31-ene-2027 |
 
 ## Para quién se diseña
 
-Áreas de riesgo de bancos y cooperativas que atienden pymes sin historial, y evaluadores de procesos de contratación pública.
+Áreas de riesgo y crédito de bancos y cooperativas que atienden pymes sin historial bancario.
 
 ## Metas
 
 **Hasta 30-nov-2026**
-- [ ] Reemplazar el análisis simulado de licitaciones por extracción real de un pliego público de ejemplo
 - [ ] Documentar en el README qué está simulado y qué es real
+- [ ] Definir las variables del score con datos alternativos y su justificación
 
 **Hasta 31-dic-2026**
 - [ ] Score crediticio con un modelo simple y explicable entrenado con datos sintéticos, con métricas
-- [ ] Comparador de ofertas que marca requisitos faltantes en un pliego de ejemplo
+- [ ] Explicación por solicitud: qué variables subieron o bajaron el puntaje
 
 **Hasta 31-ene-2027**
-- [ ] Demo de 3 minutos en video y caso de uso para cada reto
+- [ ] Demo de 3 minutos en video del flujo de evaluación de una pyme
 
 ## Fuera de alcance
 
