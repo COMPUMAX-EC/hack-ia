@@ -1,32 +1,32 @@
-# Plan del proyecto
+# Project plan
 
 | | |
 |---|---|
-| **Sector objetivo** | Banca y fintech · score crediticio para PYMEs sin historial bancario |
-| **Segmento** | A (único segmento del plan) |
-| **Esfuerzo asignado** | 9 % del tiempo de proyectos (dentro del 50 % de banca y fintech) |
-| **Horizonte** | 9-nov-2026 → 31-ene-2027 |
+| **Target sector** | Banking and fintech · credit scoring for SMEs without a banking history |
+| **Segment** | A (the plan's only segment) |
+| **Allocated effort** | 9% of project time (within the 50% for banking and fintech) |
+| **Horizon** | 9 Nov 2026 → 31 Jan 2027 |
 
-## Para quién se diseña
+## Who it is designed for
 
-Áreas de riesgo y crédito de bancos y cooperativas que atienden pymes sin historial bancario.
+Risk and credit teams at banks and cooperatives that serve SMEs without a banking history.
 
-## Metas
+## Goals
 
-**Hasta 30-nov-2026**
-- [ ] Documentar en el README qué está simulado y qué es real
-- [ ] Definir las variables del score con datos alternativos y su justificación
+**By 30 Nov 2026**
+- [ ] Document in the README what is simulated and what is real
+- [ ] Define the score's alternative-data variables and their rationale
 
-**Hasta 31-dic-2026**
-- [ ] Score crediticio con un modelo simple y explicable entrenado con datos sintéticos, con métricas
-- [ ] Explicación por solicitud: qué variables subieron o bajaron el puntaje
+**By 31 Dec 2026**
+- [ ] Credit score with a simple, explainable model trained on synthetic data, with metrics
+- [ ] Per-application explanation: which variables raised or lowered the score
 
-**Hasta 31-ene-2027**
-- [ ] Demo de 3 minutos en video del flujo de evaluación de una pyme
+**By 31 Jan 2027**
+- [ ] 3-minute video demo of the evaluation flow for an SME
 
-## Fuera de alcance
+## Out of scope
 
-Datos reales de personas o de procesos en curso.
+Real data about people or ongoing processes.
 
 ---
-Revisión cada domingo: avance de metas y horas dedicadas. Plan general de sectores en COMPUMAX-EC/red-contactos-ti (privado).
+Reviewed every Sunday: progress on goals and hours spent. Overall sector plan in COMPUMAX-EC/red-contactos-ti (private).
