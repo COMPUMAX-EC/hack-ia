@@ -1,56 +1,53 @@
-# FINOVA 🦊 · IA para licitaciones y crédito PYME
+# FINOVA 🦊 · AI for public tenders and SME credit
 
-**Innovando hoy, transformando finanzas.** FINOVA es la propuesta de nuestro equipo para una hackatón de
-inteligencia artificial en finanzas. Resuelve dos problemas del sector financiero de Ecuador:
+🇬🇧 **English** · 🇪🇨 [Español](README.es.md)
 
-1. **Licitaciones inteligentes:** los procesos de licitación pública son lentos y propensos a errores. FINOVA
-   analiza los documentos automáticamente, detecta riesgos y compara ofertas para ahorrar tiempo al evaluador.
-2. **Evaluación crediticia inclusiva para PYMEs:** muchas pequeñas empresas no acceden a crédito porque no tienen
-   historial bancario. FINOVA calcula un **score crediticio con datos alternativos**: presencia digital,
-   referencias comerciales, actividad financiera y datos de comportamiento.
+**Innovating today, transforming finance.** FINOVA is our team's proposal for an AI-in-finance hackathon. It tackles
+two problems in Ecuador's financial sector:
 
-**Demo en línea:** https://hack-ia.vercel.app
+1. **Smart tenders:** public tender processes are slow and error-prone. FINOVA analyzes the documents automatically,
+   detects risks and compares bids to save the evaluator time.
+2. **Inclusive credit scoring for SMEs:** many small businesses cannot get credit because they have no banking
+   history. FINOVA computes a **credit score from alternative data**: digital presence, trade references, financial
+   activity and behavioral data.
 
-> Es un prototipo: los análisis de NLP y Machine Learning están **simulados** en la interfaz para mostrar el flujo.
+**Live demo:** https://hack-ia.vercel.app (in Spanish)
 
-## Qué muestra la demo
+> It is a prototype: the NLP and machine-learning analyses are **simulated** in the interface to show the flow.
 
-- `/` — presentación de FINOVA, misión y soluciones.
-- `/reto1` — licitaciones: tipo de documento, análisis automático, detección de riesgos, comparación inteligente.
-- `/reto2` — score crediticio IA para PYMEs y su impacto social.
-- `/equipo` — el equipo: Geovanny Basantes, Edison López y Jaime Pergueza.
+## What the demo shows
 
-Marca: azul oscuro `#0D3B66`, verde azulado `#1FAA59`, naranja `#F25C05` y gris claro `#E1E5F2`, con **Byte**, el
-zorro mascota.
+- `/` — FINOVA introduction, mission and solutions.
+- `/reto1` — tenders: document type, automatic analysis, risk detection, smart comparison.
+- `/reto2` — AI credit score for SMEs and its social impact.
+- `/equipo` — the team: Geovanny Basantes, Edison López and Jaime Pergueza.
 
-## Detalles técnicos
+Brand: dark blue `#0D3B66`, teal green `#1FAA59`, orange `#F25C05` and light grey `#E1E5F2`, with **Byte**, the fox
+mascot.
 
-| Capa | Tecnología |
+## Technical details
+
+| Layer | Technology |
 |---|---|
 | Framework | Next.js 15 (App Router) + React 19 |
-| Lenguaje | TypeScript |
-| Estilos | CSS propio con sistema de diseño |
-| Íconos | lucide-react |
-| Despliegue | Vercel |
+| Language | TypeScript |
+| Styling | Custom CSS with a design system |
+| Icons | lucide-react |
+| Deployment | Vercel |
 
 ```
-src/app/              páginas: inicio, reto1, reto2, equipo
+src/app/              pages: home, reto1, reto2, equipo
 src/components/       Header, Layout, ByteMascot
-public/               logo, fotos del equipo
+public/               logo, team photos
 ```
 
-### Ejecutar localmente
+### Run locally
 
 ```bash
 npm install
 npm run dev      # http://localhost:3000
 ```
 
-## In English
+## License
 
-FINOVA is a hackathon prototype for AI in finance: automatic analysis of public tender documents, and an inclusive
-credit score for SMEs based on alternative data. AI results are simulated in the UI. Next.js 15 + React 19 on Vercel.
-
-## Licencia
-
-El código está bajo licencia [MIT](LICENSE). Las fotos del equipo y la marca FINOVA no forman parte de la licencia.
+The code is under the [MIT](LICENSE) license. The team photos and the FINOVA brand are not covered by the license.
